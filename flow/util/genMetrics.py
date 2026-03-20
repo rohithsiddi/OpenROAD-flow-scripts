@@ -234,7 +234,10 @@ def extract_metrics(
     synth_stat_file = rptPath + "/synth_stat.json"
     try:
         with open(synth_stat_file) as f:
-            synth_stat = json.load(f)
+            content = f.read()
+        # yosys may emit log messages (e.g. "Found gzip magic in file...")
+        # before the JSON when reading compressed liberty files. Skip them.
+        synth_stat = json.loads(content[content.index("{") :])
         modules = synth_stat.get("modules", {})
         # Prefer lookup by design name; yosys may prefix module names with a
         # backslash in JSON output, so try both forms. Fall back to the last
@@ -268,7 +271,7 @@ def extract_metrics(
             metrics_dict["synth__design__instance__area__stdcell"] = "N/A"
         else:
             metrics_dict["synth__design__instance__area__stdcell"] = float(area)
-    except (IOError, json.JSONDecodeError):
+    except (IOError, json.JSONDecodeError, ValueError):
         print("[ERROR] Failed to open file:", synth_stat_file)
         metrics_dict["synth__design__instance__count__stdcell"] = "ERR"
         metrics_dict["synth__design__instance__area__stdcell"] = "ERR"
