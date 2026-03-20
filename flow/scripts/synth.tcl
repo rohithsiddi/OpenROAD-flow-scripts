@@ -226,7 +226,7 @@ if { $::env(SYNTH_INSBUF) } {
 # Reports
 tee -o $::env(REPORTS_DIR)/synth_check.txt check
 
-tee -o $::env(REPORTS_DIR)/synth_stat.txt stat {*}$lib_args
+tee -o $::env(REPORTS_DIR)/synth_stat.json stat -json {*}$lib_args
 
 # check the design is composed exclusively of target cells, and
 # check for other problems

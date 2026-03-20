@@ -311,7 +311,7 @@ abc.constr klayout.lyt klayout_tech.lef lib
 | `congestion.rpt`  | `VDD.rpt`           | `VSS.rpt`              |
 | `5_route_drc.rpt` | `final_clocks.webp` | `final_placement.webp` |
 | `antenna.log`     | `final_clocks.webp` | `final.webp`           |
-| `synth_stat.txt`  | `synth_check.txt`   | `final_resizer.webp`   |
+| `synth_stat.json` | `synth_check.txt`   | `final_resizer.webp`   |
 
 The table below briefly describes the reports directory files.
 
@@ -325,7 +325,7 @@ The table below briefly describes the reports directory files.
 | `antenna.log`          | Antenna check log report.                                |
 | `final_placement.webp` | Extracted image after final placement.                   |
 | `final.webp`           | Extracted image after routing.                           |
-| `synth_stat.txt`       | Post synthesis design statistics log saved here.         |
+| `synth_stat.json`      | Post synthesis design statistics in JSON format.         |
 
 The flow completes with the message below by creating a merged final GDS file.
 

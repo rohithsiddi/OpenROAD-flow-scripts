@@ -231,20 +231,47 @@ def extract_metrics(
     # Synthesis
     # =========================================================================
 
-    # The new format (>= 0.57) is: <count> <area> cells
-    extractTagFromFile(
-        "synth__design__instance__count__stdcell",
-        metrics_dict,
-        "^\\s+(\\d+)\\s+[-0-9.]+\\s+cells$",
-        rptPath + "/synth_stat.txt",
-    )
+    synth_stat_file = rptPath + "/synth_stat.json"
+    try:
+        with open(synth_stat_file) as f:
+            synth_stat = json.load(f)
+        modules = synth_stat.get("modules", {})
+        # Prefer lookup by design name; yosys may prefix module names with a
+        # backslash in JSON output, so try both forms. Fall back to the last
+        # module in the output, which yosys emits last for the top-level module.
+        top_module = (
+            modules.get(design)
+            or modules.get("\\" + design)
+            or (list(modules.values())[-1] if modules else None)
+        )
 
-    extractTagFromFile(
-        "synth__design__instance__area__stdcell",
-        metrics_dict,
-        "Chip area for (?:top )?module.*: +(\\S+)",
-        rptPath + "/synth_stat.txt",
-    )
+        num_cells = top_module.get("num_cells") if top_module else None
+        if num_cells is None:
+            print(
+                "[WARN] Tag synth__design__instance__count__stdcell not found in {}.".format(
+                    synth_stat_file
+                ),
+                "Will use N/A.",
+            )
+            metrics_dict["synth__design__instance__count__stdcell"] = "N/A"
+        else:
+            metrics_dict["synth__design__instance__count__stdcell"] = int(num_cells)
+
+        area = top_module.get("area") if top_module else None
+        if area is None:
+            print(
+                "[WARN] Tag synth__design__instance__area__stdcell not found in {}.".format(
+                    synth_stat_file
+                ),
+                "Will use N/A.",
+            )
+            metrics_dict["synth__design__instance__area__stdcell"] = "N/A"
+        else:
+            metrics_dict["synth__design__instance__area__stdcell"] = float(area)
+    except (IOError, json.JSONDecodeError):
+        print("[ERROR] Failed to open file:", synth_stat_file)
+        metrics_dict["synth__design__instance__count__stdcell"] = "ERR"
+        metrics_dict["synth__design__instance__area__stdcell"] = "ERR"
 
     # Clocks
     # =========================================================================
