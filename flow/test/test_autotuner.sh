@@ -13,6 +13,9 @@ cd ../
 ./tools/AutoTuner/installer.sh
 . ./tools/AutoTuner/setup.sh
 
+echo "Running Autotuner utility tests"
+python3 -m unittest tools.AutoTuner.test.test_utils
+
 echo "Running Autotuner smoke tune test"
 python3 -m unittest tools.AutoTuner.test.smoke_test_tune.${PLATFORM_WITHOUT_DASHES}TuneSmokeTest.test_tune
 
